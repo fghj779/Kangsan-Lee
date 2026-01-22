@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.core.database import db_manager, init_db
 from app.core.exceptions import DatabaseException
 from app.middleware.error_handler import register_exception_handlers
-from app.api.v1.endpoints import auth
+from app.api.v1.endpoints import auth, boards, listings, reputation, users
 
 # Configure logging
 logging.basicConfig(
@@ -101,6 +101,30 @@ app.include_router(
     auth.router,
     prefix=f"{settings.API_V1_STR}/auth",
     tags=["Authentication"],
+)
+
+app.include_router(
+    users.router,
+    prefix=f"{settings.API_V1_STR}/users",
+    tags=["Users"],
+)
+
+app.include_router(
+    boards.router,
+    prefix=f"{settings.API_V1_STR}",
+    tags=["Community Boards"],
+)
+
+app.include_router(
+    listings.router,
+    prefix=f"{settings.API_V1_STR}",
+    tags=["Marketplace"],
+)
+
+app.include_router(
+    reputation.router,
+    prefix=f"{settings.API_V1_STR}",
+    tags=["Reputation & Trust"],
 )
 
 

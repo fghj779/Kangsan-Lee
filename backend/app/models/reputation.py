@@ -34,8 +34,9 @@ class Reputation(Base):
 
     # Reputation details
     reputation_type = Column(Enum(ReputationType), nullable=False)
-    rating = Column(Enum(Rating), nullable=False)
-    feedback = Column(Text, nullable=False)
+    rating = Column(Integer, nullable=False)  # 1-5 star rating
+    feedback_text = Column(Text, nullable=False)
+    is_verified_transaction = Column(Boolean, default=False, nullable=False)
 
     # Context
     transaction_id = Column(Integer, ForeignKey("transactions.id"), nullable=True)
