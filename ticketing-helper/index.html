@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticketing Helper Tool</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-ticket-alt"></i> Ticketing Helper Tool</h1>
+            <p class="subtitle">Legal ticket purchasing assistant with monitoring and timing tools</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Countdown Timer Section -->
+            <section class="card countdown-section">
+                <h2><i class="fas fa-clock"></i> Countdown Timer</h2>
+                <div class="timer-config">
+                    <div class="form-group">
+                        <label for="sale-datetime">Sale Opening Time:</label>
+                        <input type="datetime-local" id="sale-datetime" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <label for="timezone">Timezone:</label>
+                        <select id="timezone" class="input-field">
+                            <option value="America/New_York">Eastern Time (ET)</option>
+                            <option value="America/Chicago">Central Time (CT)</option>
+                            <option value="America/Denver">Mountain Time (MT)</option>
+                            <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                            <option value="Europe/London">London (GMT)</option>
+                            <option value="Europe/Paris">Paris (CET)</option>
+                            <option value="Asia/Tokyo">Tokyo (JST)</option>
+                            <option value="Asia/Seoul">Seoul (KST)</option>
+                            <option value="Australia/Sydney">Sydney (AEDT)</option>
+                        </select>
+                    </div>
+                    <button id="start-countdown" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Start Countdown
+                    </button>
+                </div>
+                <div class="countdown-display" id="countdown-display">
+                    <div class="time-unit">
+                        <span class="time-value" id="days">00</span>
+                        <span class="time-label">Days</span>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="hours">00</span>
+                        <span class="time-label">Hours</span>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="minutes">00</span>
+                        <span class="time-label">Minutes</span>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="seconds">00</span>
+                        <span class="time-label">Seconds</span>
+                    </div>
+                </div>
+                <div class="alert-status" id="alert-status"></div>
+            </section>
+
+            <!-- Web Page Monitor Section -->
+            <section class="card monitor-section">
+                <h2><i class="fas fa-eye"></i> Web Page Monitor</h2>
+                <div class="monitor-config">
+                    <div class="form-group">
+                        <label for="monitor-url">Website URL:</label>
+                        <input type="url" id="monitor-url" class="input-field" placeholder="https://example.com/tickets">
+                    </div>
+                    <div class="form-group">
+                        <label for="refresh-interval">Refresh Interval (seconds):</label>
+                        <input type="number" id="refresh-interval" class="input-field" value="30" min="5" max="300">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="enable-notifications">
+                        <label for="enable-notifications">Enable Desktop Notifications</label>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="enable-sound">
+                        <label for="enable-sound">Enable Sound Alerts</label>
+                    </div>
+                    <div class="button-group">
+                        <button id="start-monitor" class="btn btn-success">
+                            <i class="fas fa-play-circle"></i> Start Monitoring
+                        </button>
+                        <button id="stop-monitor" class="btn btn-danger" disabled>
+                            <i class="fas fa-stop-circle"></i> Stop Monitoring
+                        </button>
+                    </div>
+                </div>
+                <div class="monitor-status" id="monitor-status">
+                    <div class="status-item">
+                        <span class="status-label">Status:</span>
+                        <span class="status-value" id="monitor-status-text">Idle</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Last Check:</span>
+                        <span class="status-value" id="last-check-time">Never</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Changes Detected:</span>
+                        <span class="status-value" id="changes-count">0</span>
+                    </div>
+                </div>
+                <div class="monitor-log" id="monitor-log">
+                    <h3>Activity Log</h3>
+                    <div class="log-content" id="log-content">
+                        <p class="log-empty">No activity yet. Start monitoring to see updates.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Connection Speed Tester Section -->
+            <section class="card speed-section">
+                <h2><i class="fas fa-tachometer-alt"></i> Connection Speed Tester</h2>
+                <div class="speed-config">
+                    <div class="form-group">
+                        <label for="test-url">Test URL:</label>
+                        <input type="url" id="test-url" class="input-field" placeholder="https://example.com">
+                    </div>
+                    <button id="test-speed" class="btn btn-info">
+                        <i class="fas fa-bolt"></i> Test Connection
+                    </button>
+                </div>
+                <div class="speed-results" id="speed-results">
+                    <div class="result-item">
+                        <div class="result-icon">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        <div class="result-info">
+                            <span class="result-label">Latency</span>
+                            <span class="result-value" id="latency-value">-- ms</span>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="result-info">
+                            <span class="result-label">Connection Quality</span>
+                            <span class="result-value" id="quality-value">Not tested</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="speed-suggestions" id="speed-suggestions">
+                    <h3>Optimization Suggestions</h3>
+                    <ul id="suggestions-list">
+                        <li>Run a connection test to get personalized suggestions</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Auto-Login Helper Section -->
+            <section class="card login-section">
+                <h2><i class="fas fa-user-lock"></i> Browser Auto-Login Helper</h2>
+                <div class="login-info">
+                    <p><i class="fas fa-info-circle"></i> Your credentials are encrypted and stored locally in your browser. They never leave your device.</p>
+                </div>
+                <div class="login-config">
+                    <div class="form-group">
+                        <label for="login-website">Website:</label>
+                        <input type="url" id="login-website" class="input-field" placeholder="https://ticketing-website.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-username">Username/Email:</label>
+                        <input type="text" id="login-username" class="input-field" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password:</label>
+                        <input type="password" id="login-password" class="input-field" placeholder="••••••••">
+                    </div>
+                    <div class="button-group">
+                        <button id="save-credentials" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Credentials
+                        </button>
+                        <button id="clear-credentials" class="btn btn-warning">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+                <div class="saved-logins" id="saved-logins">
+                    <h3>Saved Login Sites</h3>
+                    <div id="saved-logins-list" class="logins-list">
+                        <p class="logins-empty">No saved credentials yet.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Ticketing Helper Tool v1.0 | For Legal Use Only</p>
+            <p><i class="fas fa-shield-alt"></i> All data is stored locally and encrypted</p>
+        </footer>
+    </div>
+
+    <!-- Notification Permission Modal -->
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-bell"></i> Enable Notifications?</h3>
+            <p>This tool would like to send you desktop notifications when page changes are detected.</p>
+            <div class="button-group">
+                <button id="allow-notifications" class="btn btn-success">Allow</button>
+                <button id="deny-notifications" class="btn btn-danger">Deny</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/crypto-utils.js"></script>
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/countdown.js"></script>
+    <script src="assets/js/monitor.js"></script>
+    <script src="assets/js/speed-test.js"></script>
+    <script src="assets/js/auto-login.js"></script>
+    <script src="assets/js/notifications.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
