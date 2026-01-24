@@ -1,0 +1,306 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// CORE SPORTS ENTITIES
+// ================================
+
+model Sport {
+  id               String   @id @default(cuid())
+  name             String   @unique
+  displayName      String
+  category         String
+  complexityLevel  Int      @default(5)
+  description      String   @db.Text
+  imageUrl         String?
+  popularity       Int      @default(50)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  leagues          League[]
+  rules            Rule[]
+  interactions     Interaction[]
+
+  @@index([popularity])
+}
+
+model League {
+  id              String   @id @default(cuid())
+  sportId         String
+  sport           Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+
+  name            String
+  region          String
+  tier            Int      @default(1)
+  season          String?
+
+  imageUrl        String?
+  description     String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  teams           Team[]
+  interactions    Interaction[]
+
+  @@unique([sportId, name])
+  @@index([sportId, tier])
+}
+
+model Team {
+  id                String   @id @default(cuid())
+  leagueId          String
+  league            League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+
+  name              String
+  shortName         String
+  city              String?
+  country           String
+  foundedYear       Int?
+
+  logoUrl           String?
+  primaryColor      String?
+  secondaryColor    String?
+  stadiumName       String?
+
+  playstyle         String[]
+  fanbaseRegions    String[]
+  successLevel      String   @default("mid")
+  fanbaseSize       String   @default("medium")
+
+  story             String?  @db.Text
+  culture           String?  @db.Text
+
+  winRate           Float?   @default(0.5)
+  popularityScore   Int      @default(50)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  players           Player[]
+  interactions      Interaction[]
+  userPreferences   UserPreference[]
+
+  @@unique([leagueId, name])
+  @@index([leagueId])
+  @@index([successLevel])
+}
+
+model Player {
+  id                String   @id @default(cuid())
+  teamId            String?
+  team              Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  firstName         String
+  lastName          String
+  displayName       String
+  position          String
+  jerseyNumber      Int?
+
+  nationality       String
+  dateOfBirth       DateTime?
+  height            Float?
+  weight            Float?
+
+  imageUrl          String?
+
+  playstyleTags     String[]
+  narrative         String?  @db.Text
+  achievements      Json?
+  stats             Json?
+
+  popularityScore   Int      @default(50)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  interactions      Interaction[]
+
+  @@index([teamId])
+  @@index([popularityScore])
+}
+
+model Rule {
+  id                String   @id @default(cuid())
+  sportId           String
+  sport             Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+
+  title             String
+  slug              String
+  category          String
+  difficulty        Int      @default(5)
+
+  description       String   @db.Text
+  explanation       String   @db.Text
+
+  visualizationType String?
+  visualConfig      Json?
+
+  imageUrl          String?
+  videoUrl          String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  interactions      Interaction[]
+
+  @@unique([sportId, slug])
+  @@index([sportId, difficulty])
+}
+
+// ================================
+// USER & PREFERENCE SYSTEM
+// ================================
+
+model User {
+  id                String   @id @default(cuid())
+
+  email             String?  @unique
+  name              String?
+
+  sessionId         String?  @unique
+  isAnonymous       Boolean  @default(true)
+
+  hasCompletedQuiz  Boolean  @default(false)
+  onboardingStep    Int      @default(0)
+
+  timezone          String?
+  region            String?
+  language          String   @default("en")
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  lastActiveAt      DateTime @default(now())
+
+  preferences       UserPreference?
+  interactions      Interaction[]
+  quizResponses     QuizResponse[]
+
+  @@index([sessionId])
+  @@index([lastActiveAt])
+}
+
+model UserPreference {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  preferredSports   String[]
+
+  preferredPace     String?
+  preferredStyle    String?
+  teamPersonality   String?
+
+  timezone          String?
+  regionPreference  String[]
+
+  excitementFactors String[]
+
+  followedTeams     Team[]
+
+  preferenceVector  Json?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model QuizResponse {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  questionId        String
+  answers           Json
+
+  createdAt         DateTime @default(now())
+
+  @@index([userId])
+  @@index([questionId])
+}
+
+// ================================
+// INTERACTION TRACKING
+// ================================
+
+model Interaction {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  entityType        String
+  entityId          String
+
+  sportId           String?
+  sport             Sport?   @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  leagueId          String?
+  league            League?  @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  teamId            String?
+  team              Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  playerId          String?
+  player            Player?  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  ruleId            String?
+  rule              Rule?    @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  type              String
+
+  dwellTime         Int?
+  metadata          Json?
+
+  weight            Float    @default(1.0)
+
+  createdAt         DateTime @default(now())
+
+  @@index([userId, entityType])
+  @@index([userId, type])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// ================================
+// RECOMMENDATION SUPPORT
+// ================================
+
+model TeamSimilarity {
+  id                String   @id @default(cuid())
+
+  teamAId           String
+  teamBId           String
+
+  similarityScore   Float
+
+  reasons           String[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([teamAId, teamBId])
+  @@index([similarityScore])
+}
+
+model PlayerSimilarity {
+  id                String   @id @default(cuid())
+
+  playerAId         String
+  playerBId         String
+
+  similarityScore   Float
+  reasons           String[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([playerAId, playerBId])
+  @@index([similarityScore])
+}
